@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException 
 
 app = FastAPI()
 from pydantic import BaseModel
@@ -38,8 +38,11 @@ def obtener_tarea(id: int):
     for tarea in tareas:
         if tarea["id"] == id:
             return tarea
+    raise HTTPException(
+        status_code=404,
+        detail="Tarea no encontrada"
+    )
 
-    return {"mensaje": "Tarea no encontrada"}
 
 @app.post("/tareas", status_code=201)
 def crear_tarea(datos: TareaNueva):
@@ -59,7 +62,7 @@ def actualizar_tarea(id:int, datos: TareaNueva):
             tarea["estado"]= datos.estado
             return tarea
 
-    return {"mensaje": "Tarea no encontrada"}
+    raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
 @app.delete("/tareas/{id}")
 def eliminar_tarea(id:int):
@@ -67,4 +70,4 @@ def eliminar_tarea(id:int):
         if tarea["id"]== id:
             tareas.remove(tarea)
             return {"mensaje":"Tarea eliminada correctamente"}
-    return {"mensaje":"tarea no encontrada"}
+    raise HTTPException(status_code=404, detail="Tarea no encontrada")
